@@ -114,8 +114,7 @@ int omok(int row, int col, int _player, int __board[15][15]) {
 }
 
 // 오목 시작
-void OmokPlay(int *game, int _player, int _next_player, int *cur_player\
-			, int _board[15][15], SOCKET _client_sock, SQL &__sql) {
+void OmokPlay(volatile int *game, int _player, int _next_player, volatile int *cur_player, int _board[15][15], SOCKET _client_sock, SQL &__sql) {
 	// 플레이어 1 차례 확인, 시작위치로 커서 이동
 	printCurPlayer(1, 2);
 	// 커서 위치 초기화
@@ -126,7 +125,8 @@ void OmokPlay(int *game, int _player, int _next_player, int *cur_player\
 	int end_line[4] = { cur_y, cur_y + 14, cur_x, cur_x + 14 * 3 };
 	while (*game) {
 		// 본인 차례가 아닌 경우 키보드 입력 불가
-		while (*cur_player != _player);
+		//while (*cur_player != _player);
+		while (*cur_player != _player) if (_kbhit()) _getch();
 		// 키보드 입력
 		if (_kbhit()) {
 			char c = _getch();
@@ -163,8 +163,7 @@ void OmokPlay(int *game, int _player, int _next_player, int *cur_player\
 				printCurPlayer(_next_player, _player);
 				// "게임종료여부|플레이어|x|y|" 값을 담은 문자열을 서버로 전송
 				string msg;
-				msg = std::to_string((*game)) + '|' + std::to_string(_player) + '|' + \
-					std::to_string(cur_x) + '|' + std::to_string(cur_y) + "|";
+				msg = std::to_string((*game)) + '|' + std::to_string(_player) + '|' + std::to_string(cur_x) + '|' + std::to_string(cur_y) + "|";
 				send(_client_sock, msg.c_str(), MAX_SIZE, 0);
 				// 오목 완성 확인, 미완성시 차례 변경
 				if (omok(_row, _col, _player, _board)) {

@@ -1,6 +1,6 @@
 #pragma once
 #pragma comment(lib, "ws2_32.lib")
-#pragma comment(lib, "mysqlcppconn.lib")
+//#pragma comment(lib, "mysqlcppconn.lib")
 
 #include <WinSock2.h>
 #include <WS2tcpip.h>
@@ -30,5 +30,3 @@ using std::thread;
 #define LEFT 75
 #define RIGHT 77
 #define SPACE 32
-
-// git Å×½ºÆ®

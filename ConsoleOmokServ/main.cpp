@@ -54,7 +54,7 @@ void startSql() {
 	try {
 		driver = sql::mysql::get_mysql_driver_instance();
 		con = driver->connect(server, username, password);
-		con->setSchema("chatting"); // chatting DB
+		con->setSchema("omok"); // omok DB
 	}
 	catch (sql::SQLException& e) {
 		cout << "Could not connect to server. Error message: " << e.what() << endl;
@@ -288,14 +288,12 @@ void recvMsg(int idx) {
 			}
 			// 채팅 보내기
 			else {
-				pstmt = con->prepareStatement("INSERT INTO chatting(chatname, time, recv) \
-												VALUE(?, NOW(), ?)");
+				pstmt = con->prepareStatement("INSERT INTO chatting(chatname, time, recv) VALUE(?, NOW(), ?)");
 				pstmt->setString(1, sck_list[idx].user);
 				pstmt->setString(2, string(buf));
 				pstmt->execute();
 
-				pstmt = con->prepareStatement("SELECT chatname, DATE_FORMAT(time,'%h:%i:%s'), \
-												recv FROM chatting ORDER BY time DESC LIMIT 1");
+				pstmt = con->prepareStatement("SELECT chatname, DATE_FORMAT(time,'%h:%i:%s'), recv FROM chatting ORDER BY time DESC LIMIT 1");
 				result = pstmt->executeQuery();
 				if (result->next()) {
 					string chatname = result->getString(1);

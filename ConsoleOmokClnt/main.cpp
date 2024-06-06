@@ -13,8 +13,8 @@ int chat_recv(); // 메시지 전달 받기(서버->클라이언트)
 int room_count; // 방 개수
 int player; // 플레이어 번호
 int next_player; // 다음 플레이어 번호
-int cur_player; // 현재 플레이어(게임순서)
-int game; // 게임 실행 유무(종료 :0, 실행 :1)
+volatile int cur_player; // 현재 플레이어(게임순서)
+volatile int game; // 게임 실행 유무(종료 :0, 실행 :1)
 int board[15][15]; // 오목판
 
 int main()
@@ -107,7 +107,8 @@ int main()
 				// 서버에게 채팅 메시지를 전달받기 위한 스레드 생성
 				thread th2(chat_recv);
 				
-				
+				// 마지막 입력의 개행 문자를 제거
+				cin.ignore();
 				// 서버에게 채팅 메시지를 보내기
 				while (1) {
 					string text;
@@ -122,7 +123,9 @@ int main()
 						cout << "방 이름을 입력해주세요 :";
 						string room_name;
 						std::getline(cin, room_name);
-						send(client_sock, room_name.c_str(), MAX_SIZE, 0) != SOCKET_ERROR;
+						send(client_sock, room_name.c_str(), MAX_SIZE, 0);
+						// 방 생성 대기
+						Sleep(500);
 
 						// 플레이어 순서 지정
 						player = 1;
@@ -132,11 +135,12 @@ int main()
 						// 게임시작
 						while (!game); // 게임 실행 대기
 						OmokPlay(&game, player, next_player, &cur_player, board, client_sock, _sql);
+
 						// 게임 종료 메시지 출력, 소켓 연결 종료
 						gotoxy(0, 17);
 						cout << "게임이 종료되었습니다.\n5초 후 메인메뉴로 이동합니다...";
-						closesocket(client_sock);
 						Sleep(5000);
+						closesocket(client_sock);
 						break;
 					}
 					else if (text == "/입장") {
@@ -145,10 +149,12 @@ int main()
 						char num;
 						cin >> num;
 						send(client_sock, &num, MAX_SIZE, 0);
-						if (num-'0' > room_count) {
+						if (num - '0' > room_count || num - '0' <= 0) {
 							cout << "방 번호가 정확하지 않습니다. (현재 방 개수 :" << room_count << ")" << endl;
 							continue;
 						}
+						// 방 입장 대기
+						Sleep(500);
 
 						// 플레이어 순서 지정
 						player = 2;
@@ -158,11 +164,12 @@ int main()
 						// 게임시작
 						while (!game); // 게임 실행 대기
 						OmokPlay(&game, player, next_player, &cur_player, board, client_sock, _sql);
+
 						// 게임 종료 메시지 출력, 소켓 연결 종료
 						gotoxy(0, 17);
 						cout << "게임이 종료되었습니다.\n5초 후 메인메뉴로 이동합니다...";
-						closesocket(client_sock);
 						Sleep(5000);
+						closesocket(client_sock);
 						break;
 					}
 				}

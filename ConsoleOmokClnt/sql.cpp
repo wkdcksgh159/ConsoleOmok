@@ -8,7 +8,7 @@ SQL::SQL()
 	try {
 		driver = sql::mysql::get_driver_instance();
 		con = driver->connect(server, username, password);
-		con->setSchema("chatting"); // chatting DB
+		con->setSchema("omok"); // omok DB
 	}
 	catch (sql::SQLException& e) {
 		cout << "Could not connect to server. Error message: " << e.what() << endl;
@@ -57,12 +57,13 @@ int SQL::login()
 {
 	cout << ">>아이디 : ";
 	cin >> id;
+	if (id == "0") return 0;
 	cout << ">>비밀번호 : ";
 	pw = inputPw();
+	if (pw == "0") return 0;
 	cout << endl;
 
-	pstmt = con->prepareStatement("SELECT id, pw FROM user \
-		WHERE id=?");
+	pstmt = con->prepareStatement("SELECT id, pw FROM user WHERE id=?");
 	pstmt->setString(1, id);
 	result = pstmt->executeQuery();
 
@@ -157,6 +158,7 @@ void SQL::myProfile()
 void SQL::updateStatus() 
 {
 	cout << ">>상태메시지 입력 : ";
+	// 마지막 입력의 개행 문자를 제거
 	cin.ignore();
 	getline(cin, status);
 	
@@ -205,14 +207,12 @@ int SQL::deleteUser()
 	cout << ">>기존 비밀번호를 입력해주세요 : ";
 	string existPw = inputPw();
 
-	pstmt = con->prepareStatement("SELECT pw FROM user \
-		WHERE id=?");
+	pstmt = con->prepareStatement("SELECT pw FROM user WHERE id=?");
 	pstmt->setString(1, id);
 	result = pstmt->executeQuery();
 
 	if (existPw == result->getString("pw")) {
-		cout << "정말 삭제하시겠습니까? 삭제한 이후엔 되돌릴 수 없습니다. \
-					1. 계속하기, 2. 그만두기 : ";
+		cout << "정말 삭제하시겠습니까? 삭제한 이후엔 되돌릴 수 없습니다. 1. 계속하기, 2. 그만두기 : ";
 		char lastCheck;
 		cin >> lastCheck;
 		if (lastCheck == '1') {
@@ -248,8 +248,7 @@ void SQL::printChat(sql::ResultSet* _result)
 // 이전 채팅을 불러옴
 void SQL::beforeChat() 
 {
-	pstmt = con->prepareStatement("SELECT DATE_FORMAT(time, '%H:%i:%s'), chatname, recv\
-									 FROM chatting ORDER BY time DESC LIMIT 5");
+	pstmt = con->prepareStatement("SELECT DATE_FORMAT(time, '%H:%i:%s'), chatname, recv FROM chatting ORDER BY time DESC LIMIT 5");
 	result = pstmt->executeQuery();
 
 	printChat(result);

@@ -1,7 +1,7 @@
 #pragma once
 #pragma comment(lib, "ws2_32.lib")
-#pragma comment(lib, "libmysql.lib")
-#pragma comment(lib, "mysqlcppconn.lib")
+//#pragma comment(lib, "libmysql.lib")
+//#pragma comment(lib, "mysqlcppconn.lib")
 
 #include <WinSock2.h>
 #include <iostream>
