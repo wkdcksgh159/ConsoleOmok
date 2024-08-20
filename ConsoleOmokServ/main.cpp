@@ -194,8 +194,8 @@ void recvMsg(int idx) {
 			else if (string(buf) == "/생성") {
 				ZeroMemory(&buf, MAX_SIZE);
 				if (recv(sck_list[idx].sck, buf, MAX_SIZE, 0) > 0) {
-					// 현재 방 개수가 최대치 이하인 경우 방 생성
-					if (room_list.size() <= room_limit) {
+					// 현재 방 개수가 최대치 미만인 경우 방 생성
+					if (room_list.size() < room_limit) {
 						ROOM_INFO new_room = { };
 						new_room.sck[0] = sck_list[idx].sck;
 						new_room.user[0] = sck_list[idx].user;
